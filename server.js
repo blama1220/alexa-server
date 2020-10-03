@@ -26,9 +26,9 @@ const exphbs = require("express-handlebars");
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlinesFinal";
+// const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlinesFinal";
 
-mongoose.connect(MONGODB_URI);
+// mongoose.connect(MONGODB_URI);
 
 
 require("./routes/apiRoutes.js")(app);
@@ -37,6 +37,6 @@ require("./routes/htmlRoutes.js")(app);
 
 // Start the server
 app.listen(PORT, function() {
-  console.log("App running on port " + PORT + "!");
+  console.log("App running on http://localhost:" + PORT + "!");
 });
 
