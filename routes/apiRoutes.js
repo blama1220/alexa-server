@@ -12,7 +12,7 @@ const client = Client.buildClient(
   },
   fetch
 );
-
+let lastCheckout = "";
 let currentCheckout = "";
 
 module.exports = function (app) {
@@ -29,15 +29,33 @@ module.exports = function (app) {
 
   //See current Checkout
   app.get("/currentCheckout", function (req, res) {
-    res.json({
-      currentCheckoutId: currentCheckout,
-    });
+    if (currentCheckout === "") {
+      res.send("No current checkout");
+    } else {
+      client.checkout.fetch(currentCheckout).then((checkout) => {
+        res.json({
+          currentCheckoutId: currentCheckout,
+          webURL: checkout.webUrl,
+        });
+      });
+    }
+  });
+
+  app.get("/lastCheckout", function (req, res) {
+    if (lastCheckout === "") {
+      res.send("No current checkout");
+    } else {
+      client.checkout.fetch(lastCheckout).then((checkout) => {
+        res.json(checkout.webUrl);
+      });
+    }
   });
 
   //End Checkout
   app.get("/endCheckout", function (req, res) {
     client.checkout.fetch(currentCheckout).then((checkout) => {
       // Do something with the checkout
+      lastCheckout = checkout.id;
       console.log("--------------COMPLETE-----------------");
       currentCheckout = ""; // ID of an existing checkout
       res.json(checkout);
@@ -120,7 +138,7 @@ module.exports = function (app) {
     };
 
     client.product.fetch(productId[req.params.productId]).then((product) => {
-      // res price and availability
+      // Do something with the product
       res.json({
         price: product.variants[0].price,
         onStock: product.availableForSale,
