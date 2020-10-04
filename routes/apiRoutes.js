@@ -20,6 +20,7 @@ module.exports = function (app) {
   app.get("/startCheckout", function (req, res) {
     client.checkout.create().then((checkout) => {
       currentCheckout = checkout.id; // ID of an existing checkout
+      Realcheckout = checkout;
       res.json({
         currentCheckoutId: currentCheckout,
       });
@@ -109,25 +110,21 @@ module.exports = function (app) {
       });
   });
 
-  //Delete Item
-  app.get("/delete/:item", function (req, res) {
-    const checkoutId = currentCheckout; // ID of an existing checkout
-    const item = {
-      iphone: "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0VmFyaWFudC8zNjIyODc5MDc0NzI5OA==", //Variant ID
+  //Check availability
+  app.get("/product/:productId", function (req, res) {
+    // Fetch a single product by ID
+    const productId = {
+      iphone: "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0LzU3MzQwMjMyMDA5MzA=", // ID
       watch: "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0LzU3ODc4MDgxNzAxNDY=", //ID
-      airpods: "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0VmFyaWFudC8zNjQ1ODYyNjQ4MjMzOA==", //Variant ID
+      airpods: "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0LzU3ODc4NzgyOTM2NjY=", // ID
     };
-    
-    let lineItemIdsToRemove = [item[req.params.item]];
-    // let lineItemIdsToRemove = [item[req.params.item]];
-    console.log("CheckoutID: " + checkoutId);
-    console.log("ItemIdsToRemove: " + lineItemIdsToRemove);
-    // Remove an item from the checkout
-    client.checkout
-      .removeLineItems(checkoutId, lineItemIdsToRemove)
-      .then((checkout) => {
-        // Do something with the updated checkout
-        res.json(checkout); //Return updated checkout
+
+    client.product.fetch(productId[req.params.productId]).then((product) => {
+      // res price and availability
+      res.json({
+        price: product.variants[0].price,
+        onStock: product.availableForSale,
       });
+    });
   });
 };
