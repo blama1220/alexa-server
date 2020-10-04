@@ -17,14 +17,19 @@ let currentCheckout = "";
 
 module.exports = function (app) {
   //Generate checkoutID
+
   app.get("/startCheckout", function (req, res) {
-    client.checkout.create().then((checkout) => {
-      currentCheckout = checkout.id; // ID of an existing checkout
-      Realcheckout = checkout;
-      res.json({
-        currentCheckoutId: currentCheckout,
+    if (currentCheckout === "") {
+      client.checkout.create().then((checkout) => {
+        currentCheckout = checkout.id; // ID of an existing checkout
+        Realcheckout = checkout;
+        res.json({
+          currentCheckoutId: currentCheckout,
+        });
       });
-    });
+    } else {
+      res.send("Still here");
+    }
   });
 
   //See current Checkout
